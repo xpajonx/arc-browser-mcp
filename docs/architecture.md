@@ -10,6 +10,8 @@ Arc is running as a Windows Store app while this OpenCode process runs in WSL2. 
 
 This implementation invokes Windows PowerShell from WSL2 and calls `Windows.System.Launcher.LaunchUriAsync` with `LauncherOptions.TargetApplicationPackageFamilyName` set to Arc's installed package family name. Windows routes the URI to Arc even though Chrome is the default HTTP(S) handler. This works with the Arc process already open, does not send synthetic keystrokes, and requires no browser restart or extension install. The API's successful return confirms dispatch; it does not provide a page-load or DOM result.
 
+Win32 `SendInput` was tested and removed: Windows reported keyboard events sent, but Arc's page did not navigate. Event acceptance is not evidence of browser navigation. The packaged-app route is verified with an MCP call plus a request received by a local loopback test page.
+
 ## Boundaries
 
 - `src/` contains MCP registration, URL validation, and process invocation.
