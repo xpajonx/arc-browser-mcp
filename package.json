@@ -2,8 +2,24 @@
   "name": "arc-browser-mcp-server",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "description": "A local stdio MCP server for safe URL navigation in the running Windows Arc Browser.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xpajonx/arc-browser-mcp.git"
+  },
+  "homepage": "https://github.com/xpajonx/arc-browser-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/xpajonx/arc-browser-mcp/issues"
+  },
+  "keywords": [
+    "opencode",
+    "mcp",
+    "arc-browser",
+    "windows",
+    "wsl2"
+  ],
   "main": "dist/src/index.js",
   "files": [
     "dist",
@@ -14,6 +30,7 @@
     "build": "tsc -p tsconfig.json",
     "test": "npm run build && node --test tests/*.test.mjs",
     "eval": "npm run build && node evals/run.mjs",
+    "test:live": "npm run build && node tests/live-smoke.mjs",
     "start": "node dist/src/index.js"
   },
   "engines": {

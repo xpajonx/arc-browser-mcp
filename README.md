@@ -1,44 +1,83 @@
-# Arc Browser MCP
+# Arc Browser MCP for OpenCode
 
-Local stdio MCP server for opening URLs in the currently running Windows Arc Browser from OpenCode in WSL2.
+[![CI](https://github.com/xpajonx/arc-browser-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/xpajonx/arc-browser-mcp/actions/workflows/ci.yml)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-## Tools
+A local stdio MCP server that lets OpenCode navigate the Arc Browser already running on Windows from WSL2. It targets Arc directly, even when another browser is the Windows default.
 
-- `arc_browser_status`: checks for a visible Arc window. It does not read tabs, titles, URLs, or page content.
-- `arc_navigate`: navigates Arc to an absolute HTTP(S) URL through Windows packaged-app activation. Windows may choose the current tab or a new tab.
+**Tools:** `arc_browser_status` checks for an open Arc window. `arc_navigate` opens an absolute HTTP(S) URL in Arc.
 
-No CDP port, browser restart, extension, login token, or remote service is used.
+## Requirements
+
+- Windows 10 or 11 with the packaged Arc Browser installed for the signed-in user
+- WSL2 with Windows interop enabled
+- Node.js 20 or newer and npm
+- OpenCode V2
+- Arc open with a visible window when the tools are called
+
+This project does not use CDP, an extension, browser debugging ports, hosted APIs, or third-party browser services. It is not an npm-published package. Install it from this repository.
 
 ## Install
 
-Requirements: Windows Arc running in the logged-in desktop, WSL2 Windows interop enabled, Node.js 20+, and Windows PowerShell 5.1 available as `powershell.exe`.
-
-From this directory:
-
 ```bash
-npm install
+git clone https://github.com/xpajonx/arc-browser-mcp.git
+cd arc-browser-mcp
+npm ci
 npm run build
 npm test
 npm run eval
 git config core.hooksPath .githooks
 ```
 
-OpenCode's project config is in `opencode.json`. To register the server for all projects, run:
+OpenCode reads the project-local `opencode.json` when you start it from this checkout. Confirm the MCP server is connected:
 
 ```bash
-opencode mcp add arc-browser --global -- node /home/xpajonx/projects/arc-browser-mcp/dist/src/index.js
+opencode mcp list
 ```
 
-Check the connection with `opencode mcp list`. The server command is `npm start` from this project, or the absolute `node .../dist/src/index.js` command above.
+To make the server available in every OpenCode project instead, register the absolute path from the checkout root:
+
+```bash
+opencode mcp add arc-browser --global -- node "$(pwd)/dist/src/index.js"
+opencode mcp list
+```
+
+The global command writes to your OpenCode user config. The project-local config does not change global settings.
 
 ## Use
 
-Call `arc_browser_status` first, then `arc_navigate` with a URL such as `https://example.com`. Windows routes the URI to the Arc app package even if another browser is the default. Arc must be installed and have a visible window.
+1. Open Arc in Windows and keep a window visible.
+2. In OpenCode, call `arc_browser_status`. It should return `available: true`.
+3. Call `arc_navigate` with a URL, for example `https://example.com`.
 
-## Safety and limits
+The tool reports the hostname and `action: "navigated"`. Windows may use the current tab or open another tab. The tool does not promise tab placement or confirm page rendering.
 
-The server allows only HTTP(S), rejects URLs containing credentials, rejects control characters, and caps URL length at 2,048 characters. It reports only the destination hostname, never the path or query. It does not read page content, click, fill forms, or access cookies. Since navigation uses the existing Arc profile, the destination can receive cookies as it would during normal browsing.
+See the [step-by-step user guide](docs/guide.md) for setup details and troubleshooting. See [architecture notes](docs/architecture.md) for design and verification details.
 
-If Arc is closed, open it and call `arc_browser_status` again. This implementation targets the current Windows/WSL2 setup; macOS and native Linux are not supported.
+## Security and privacy
 
-See [architecture notes](docs/architecture.md) for the transport choice and observed limitations.
+- Only absolute HTTP and HTTPS URLs are accepted.
+- URLs with credentials, control characters, or more than 2,048 characters are rejected.
+- The MCP server does not read tab URLs, titles, page contents, cookies, browser history, or profile files.
+- Navigation uses your existing Arc profile. The destination receives requests and cookies as it would during normal browsing.
+- The structured audit line records only the hostname, action, result, and timestamp. It omits the URL path and query.
+- A navigation can change the active browser page. Review the destination before calling the tool.
+
+## Tests
+
+```bash
+npm test       # TypeScript build and local gate tests
+npm run eval   # Offline URL-safety eval
+```
+
+The live smoke test makes Arc load a temporary local page and can change its current tab. Run it only when that is acceptable:
+
+```bash
+npm run test:live
+```
+
+The live test starts an HTTP server on loopback, calls the MCP tool, and passes only if Arc requests that local page. It makes no external network request. CI runs only the offline gate and eval.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

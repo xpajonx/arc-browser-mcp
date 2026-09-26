@@ -4,7 +4,8 @@
     "servers": {
       "arc-browser": {
         "type": "local",
-        "command": ["node", "/home/xpajonx/projects/arc-browser-mcp/dist/src/index.js"]
+        "command": ["node", "dist/src/index.js"],
+        "cwd": "."
       }
     }
   }
