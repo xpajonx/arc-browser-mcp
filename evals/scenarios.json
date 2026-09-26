@@ -1,0 +1,12 @@
+[
+  { "id": "https-basic", "url": "https://example.com", "accepted": true, "host": "example.com" },
+  { "id": "http-loopback", "url": "http://127.0.0.1:43189/ready", "accepted": true, "host": "127.0.0.1" },
+  { "id": "query-special-chars", "url": "https://example.org/search?q=a+b&rate=100%25", "accepted": true, "host": "example.org" },
+  { "id": "unicode-domain", "url": "https://bücher.example/path", "accepted": true, "host": "xn--bcher-kva.example" },
+  { "id": "ipv6-loopback", "url": "http://[::1]:8080/health", "accepted": true, "host": "[::1]" },
+  { "id": "javascript-scheme", "url": "javascript:alert(1)", "accepted": false },
+  { "id": "file-scheme", "url": "file:///C:/Users/upper/secret.txt", "accepted": false },
+  { "id": "data-scheme", "url": "data:text/html,not-a-page", "accepted": false },
+  { "id": "embedded-credentials", "url": "https://user:pass@example.com", "accepted": false },
+  { "id": "control-character", "url": "https://example.com/\n", "accepted": false }
+]

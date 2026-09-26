@@ -1,0 +1,30 @@
+{
+  "name": "arc-browser-mcp-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A local stdio MCP server for safe URL navigation in the running Windows Arc Browser.",
+  "main": "dist/src/index.js",
+  "files": [
+    "dist",
+    "execution",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "eval": "npm run build && node evals/run.mjs",
+    "start": "node dist/src/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.3"
+  }
+}
