@@ -29,7 +29,7 @@ const server = createServer((request, response) => {
 
 await new Promise((resolvePromise, rejectPromise) => {
   server.once("error", rejectPromise);
-  server.listen(0, "0.0.0.0", resolvePromise);
+  server.listen(0, "127.0.0.1", resolvePromise);
 });
 
 const address = server.address();
